@@ -359,7 +359,7 @@ export default function App() {
         />
       )}
 
-      {role === 'client' && (
+    
         <ClientDashboard
           onConnectNow={handleConnectNow}
           onSchedule={handleSchedule}
