@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import ClientDashboard from './Pages/client/ClientDashboard';
 import InterpreterDashboard from './Pages/interpreter/InterpreterDashboard';
@@ -8,7 +8,7 @@ import useRingtone from './hooks/useRingtone';
 
 
 const AGORA_APP_ID = '3bfd81124304492ea3d119b90d0497c5';
-const SOCKET_URL   =  'http://localhost:3001';
+const SOCKET_URL = 'https://lingobridge-production.up.railway.app';
 
 const ROLES = ['client', 'interpreter', 'admin'];
 const DEMO_USERS = {
@@ -17,7 +17,7 @@ const DEMO_USERS = {
   admin:       { name: 'Admin',          initials: 'AD', role: 'admin'        },
 };
 
-// â”€â”€ DEV ROLE SWITCHER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── DEV ROLE SWITCHER ─────────────────────────────────────────────
 function DevRoleSwitcher({ role, onChange }) {
   return (
     <div style={{
@@ -52,7 +52,7 @@ function DevRoleSwitcher({ role, onChange }) {
   );
 }
 
-// â”€â”€ CONNECTING OVERLAY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── CONNECTING OVERLAY ────────────────────────────────────────────
 function ConnectingOverlay({ bookingData, onCancel }) {
   return (
     <div style={{
@@ -71,12 +71,12 @@ function ConnectingOverlay({ bookingData, onCancel }) {
       <style>{'@keyframes lb-spin { to { transform: rotate(360deg); } }'}</style>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 6 }}>
-          Connecting to callâ€¦
+          Connecting to call…
         </div>
         <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
           {bookingData?.sessionType === 'video' ? 'Video call' : 'Audio call'}
-          {bookingData?.language ? ` Â· ${bookingData.language}` : ''}
-          {bookingData?.purpose  ? ` Â· ${bookingData.purpose}`  : ''}
+          {bookingData?.language ? ` · ${bookingData.language}` : ''}
+          {bookingData?.purpose  ? ` · ${bookingData.purpose}`  : ''}
         </div>
       </div>
       {onCancel && (
@@ -96,7 +96,7 @@ function ConnectingOverlay({ bookingData, onCancel }) {
   );
 }
 
-// â”€â”€ ERROR TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ERROR TOAST ───────────────────────────────────────────────────
 function ErrorToast({ message, onClose }) {
   useEffect(() => {
     const t = setTimeout(onClose, 6000);
@@ -121,13 +121,13 @@ function ErrorToast({ message, onClose }) {
         style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', fontSize: 18, padding: 0, lineHeight: 1 }}
         aria-label="Dismiss"
       >
-        Ã—
+        ×
       </button>
     </div>
   );
 }
 
-// â”€â”€ ROOT APP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ROOT APP ──────────────────────────────────────────────────────
 export default function App() {
   const [role,         setRole]         = useState('client');
   const [callState,    setCallState]    = useState('idle');
@@ -139,13 +139,13 @@ export default function App() {
   useRingtone(isRinging);
     
   const user          = DEMO_USERS[role];
-  const socketRef     = useRef(null);       // âœ… starts as null, set inside useEffect
+  const socketRef     = useRef(null);       // ✅ starts as null, set inside useEffect
   const callParamsRef = useRef(null);
   const roleRef       = useRef(role);
 
   useEffect(() => { roleRef.current = role; }, [role]);
 
-  // â”€â”€ SOCKET LIFECYCLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── SOCKET LIFECYCLE ──────────────────────────────────────────
   useEffect(() => {
     const socket = io(SOCKET_URL, {
       transports:           ['websocket'],
@@ -159,26 +159,26 @@ export default function App() {
     socketRef.current = socket;
 
     socket.onAny((eventName, ...args) => {
-      console.log('ðŸ“¨ socket event received:', eventName, args);
+      console.log('📨 socket event received:', eventName, args);
     });
 
     const onConnect = () => {
-      console.log('ðŸŸ¢ connected:', socket.id);
+      console.log('🟢 connected:', socket.id);
       setSocketReady(true);
     };
 
     const onDisconnect = (reason) => {
-      console.log('ðŸ”´ disconnected:', reason);
+      console.log('🔴 disconnected:', reason);
       setSocketReady(false);
     };
 
     const onConnectError = (err) => {
-      console.error('âŒ connect error:', err.message);
+      console.error('❌ connect error:', err.message);
     };
 
     const onCallAccepted = (data) => {
       setIsRinging(false); 
-      console.log('ðŸŸ¢ call-accepted | role:', roleRef.current, data);
+      console.log('🟢 call-accepted | role:', roleRef.current, data);
       const channelName = data.channelName || data.roomId;
       if (!channelName) {
         setConnectError('Call accepted but no channel provided.');
@@ -223,7 +223,7 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── HELPERS ───────────────────────────────────────────────────
   function _cleanupCall() {
      setIsRinging(false);
     callParamsRef.current = null;
@@ -239,7 +239,7 @@ export default function App() {
     }
   }
 
-  // â”€â”€ CLIENT: CONNECT NOW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── CLIENT: CONNECT NOW ───────────────────────────────────────
   const handleConnectNow = useCallback((bookingData) => {
     setConnectError(null);
     const socket = socketRef.current;
@@ -268,7 +268,7 @@ export default function App() {
     });
   }, []);
 
-  // â”€â”€ INTERPRETER: ACCEPT CALL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── INTERPRETER: ACCEPT CALL ──────────────────────────────────
   const handleAcceptCall = useCallback((bookingData) => {
     setConnectError(null);
     const socket = socketRef.current;
@@ -278,7 +278,7 @@ export default function App() {
     }
     const roomId = bookingData.roomId || bookingData.id;
     if (!roomId) {
-      setConnectError('Cannot accept this call â€” room ID is missing.');
+      setConnectError('Cannot accept this call — room ID is missing.');
       return;
     }
     const params = {
@@ -290,11 +290,11 @@ export default function App() {
     callParamsRef.current = params;
     setCallParams(params);
     setCallState('waiting');
-    console.log('ðŸ“¤ [accept-call] emitting:', roomId);
+    console.log('📤 [accept-call] emitting:', roomId);
     socket.emit('accept-call', { roomId });
   }, []);
 
-  // â”€â”€ LEAVE CALL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── LEAVE CALL ────────────────────────────────────────────────
   const handleLeave = useCallback(() => {
     _emitEndCall();
     _cleanupCall();
@@ -307,7 +307,7 @@ export default function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // â”€â”€ ROLE CHANGE (dev tool) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── ROLE CHANGE (dev tool) ────────────────────────────────────
   const handleRoleChange = useCallback((nextRole) => {
     _emitEndCall();
     _cleanupCall();
@@ -319,7 +319,7 @@ export default function App() {
     alert(`Session scheduled!\n\n${JSON.stringify(bookingData, null, 2)}`);
   }, []);
 
-  // â”€â”€ RENDER: IN-CALL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── RENDER: IN-CALL ───────────────────────────────────────────
   if (callState === 'in-call') {
     if (!callParams?.channel) {
       return (
@@ -342,7 +342,7 @@ export default function App() {
     );
   }
 
-  // â”€â”€ RENDER: DASHBOARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── RENDER: DASHBOARDS ────────────────────────────────────────
   return (
     <>
       {callState === 'waiting' && (
