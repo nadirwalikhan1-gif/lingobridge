@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import useBookingForm from '../hooks/useBookingForm';
+import useBookingForm from './hooks/bookingForm';
 
 /* ─── MOCK DATA ─── */
 const INTERPRETERS = [
