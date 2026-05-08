@@ -1,6 +1,12 @@
 import { useEffect } from 'react';
 import useBookingForm from './hooks/bookingForm';
 
+/* ─── SAFE FORMATTER ─── */
+const fmt = (val, fallback = '0.00') => {
+  const n = Number(val);
+  return Number.isFinite(n) ? n.toFixed(2) : fallback;
+};
+
 /* ─── MOCK DATA ─── */
 const INTERPRETERS = [
   { name: 'Maria Garcia',  rating: 4.9, reviews: 128, languages: 'Spanish',       category: 'Medical',  price: '$12.00', img: 'https://i.pravatar.cc/150?u=maria',  online: true },
@@ -392,19 +398,19 @@ export default function BookingPage({ onConnectNow, onSchedule, resetTrigger }) 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
             <span style={{ color: C.text2 }}>Base Price ({durationMin || '30'} min)</span>
-            <span style={{ color: C.text, fontWeight: 500 }}>${subtotal?.toFixed(2) || '12.00'}</span>
+            <span style={{ color: C.text, fontWeight: 500 }}>${fmt(subtotal, '12.00')}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
             <span style={{ color: C.text2, display: 'flex', alignItems: 'center', gap: 4 }}>
               Platform Fee <span style={{ cursor: 'help', fontSize: 10 }}>ⓘ</span>
             </span>
-            <span style={{ color: C.text, fontWeight: 500 }}>${platformFee?.toFixed(2) || '0.60'}</span>
+            <span style={{ color: C.text, fontWeight: 500 }}>${fmt(platformFee, '0.60')}</span>
           </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Total Price</span>
-          <span style={{ fontSize: 24, fontWeight: 800, color: C.accent }}>${total?.toFixed(2) || '12.60'}</span>
+          <span style={{ fontSize: 24, fontWeight: 800, color: C.accent }}>${fmt(total, '12.60')}</span>
         </div>
 
         {/* Secure badge */}
