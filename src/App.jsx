@@ -329,7 +329,7 @@ export default function App() {
           appId={AGORA_APP_ID}
           channel={callParams.channel}
           token={callParams.token ?? null}
-          uid={role === 'client' ? 1 : 2}   // TODO: request UID from server
+          uid={role === 'client' ? 1 : 2}
           userName={user.name}
           sessionType={callParams.bookingData?.sessionType ?? 'video'}
           onLeave={endCall}
