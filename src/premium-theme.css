@@ -1,0 +1,1082 @@
+/* ============================================================
+   LingoBridge — $100M SaaS Design System
+   Deep Teal + Warm Amber + Slate Neutrals
+
+   Principles:
+   1. Surface hierarchy (page → card → elevated → modal)
+   2. Restrained radius (16px/12px/10px/999px)
+   3. Solid buttons, subtle lift on hover
+   4. Layered ambient shadows (never heavy)
+   5. Generous whitespace (4px/8px/12px/16px/24px/32px grid)
+   6. Semantic color discipline
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ─────────────────────────────────────────────────────────────
+   1. DESIGN TOKENS (CSS Variables)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* Primary — Deep Teal */
+  --color-primary-50:  #f0fdfa;
+  --color-primary-100: #ccfbf1;
+  --color-primary-200: #99f6e4;
+  --color-primary-500: #14b8a6;
+  --color-primary-600: #0d9488;
+  --color-primary-700: #0f766e;
+  --color-primary-800: #0F4C5C;
+  --color-primary-900: #0A3A47;
+
+  /* Accent — Warm Amber (used sparingly for earnings/wallet) */
+  --color-amber-50:  #fffbeb;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #F4A261;
+  --color-amber-600: #d97706;
+
+  /* Semantic */
+  --color-success:       #2A9D8F;
+  --color-success-light: rgba(42, 157, 143, 0.08);
+  --color-success-border:rgba(42, 157, 143, 0.20);
+
+  --color-danger:        #E07A5F;
+  --color-danger-light:  rgba(224, 122, 95, 0.08);
+  --color-danger-border: rgba(224, 122, 95, 0.20);
+
+  --color-warning:       #F4A261;
+  --color-warning-light: rgba(244, 162, 97, 0.08);
+
+  /* Neutrals — Cool Slate for premium feel */
+  --color-slate-0:   #ffffff;
+  --color-slate-50:  #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* Backgrounds */
+  --bg-page:      var(--color-slate-100);
+  --bg-surface:   var(--color-slate-0);
+  --bg-elevated:  var(--color-slate-0);
+  --bg-hover:     var(--color-slate-50);
+  --bg-active:    var(--color-primary-50);
+
+  /* Text */
+  --text-primary:   var(--color-slate-900);
+  --text-secondary: var(--color-slate-600);
+  --text-muted:     var(--color-slate-500);
+  --text-inverse:   var(--color-slate-0);
+
+  /* Borders */
+  --border-subtle:  var(--color-slate-100);
+  --border-default: var(--color-slate-200);
+  --border-strong:  var(--color-slate-300);
+
+  /* Shadows — Layered ambient (modern SaaS standard) */
+  --shadow-xs:  0 1px 2px  rgba(0, 0, 0, 0.03);
+  --shadow-sm:  0 1px 3px  rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md:  0 4px 6px  rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-lg:  0 10px 15px rgba(0, 0, 0, 0.03), 0 4px 6px rgba(0, 0, 0, 0.02);
+  --shadow-xl:  0 20px 25px rgba(0, 0, 0, 0.04), 0 10px 10px rgba(0, 0, 0, 0.02);
+  --shadow-glow-primary: 0 0 0 3px rgba(15, 76, 92, 0.12);
+
+  /* Radius Scale */
+  --radius-sm:   8px;
+  --radius-md:   10px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-pill: 999px;
+
+  /* Spacing Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-xs:   12px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-md:   15px;
+  --text-lg:   16px;
+  --text-xl:   18px;
+  --text-2xl:  20px;
+  --text-3xl:  24px;
+  --text-4xl:  30px;
+
+  /* Transitions */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. GLOBAL RESET & BASE
+   ───────────────────────────────────────────────────────────── */
+html, body, #root {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(15, 76, 92, 0.15);
+  color: var(--color-slate-900);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3. TYPOGRAPHY HIERARCHY
+   ───────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.text-display {
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.text-headline {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.text-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.text-caption {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.text-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. SURFACE SYSTEM (Cards, Panels, Modals)
+   ───────────────────────────────────────────────────────────── */
+.card-base,
+.lb-card-pro,
+.lb-session-card,
+.lb-when-card,
+.lb-purpose-card,
+.metric-card,
+.stat-card,
+.panel,
+.surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-base), 
+              box-shadow var(--transition-base),
+              transform var(--transition-base);
+}
+
+.card-base:hover,
+.lb-card-pro:hover,
+.lb-session-card:hover,
+.surface:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.card-glow,
+.surface-elevated {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+/* Active/Selected Cards */
+.lb-active-pro {
+  background: linear-gradient(135deg, rgba(15, 76, 92, 0.06), rgba(15, 76, 92, 0.02));
+  border: 1.5px solid var(--color-primary-800);
+  box-shadow: var(--shadow-glow-primary), var(--shadow-sm);
+}
+
+.lb-green-pro {
+  border: 1.5px solid var(--color-success);
+  background: var(--color-success-light);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. BUTTON SYSTEM
+   ───────────────────────────────────────────────────────────── */
+.btn-base,
+button {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* Primary — Solid Teal */
+.btn-primary,
+.lb-cta-pro,
+.lb-cta-main,
+.connect-btn,
+.accept-btn,
+.btn-payout {
+  background: var(--color-primary-800);
+  color: var(--text-inverse);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-5);
+}
+
+.btn-primary:hover,
+.lb-cta-pro:hover,
+.lb-cta-main:hover {
+  background: var(--color-primary-900);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Secondary — Outline */
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  padding: var(--space-3) var(--space-5);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* Ghost */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: var(--space-2) var(--space-3);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Success — Accept actions */
+.btn-success {
+  background: var(--color-success);
+  color: var(--text-inverse);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-5);
+}
+
+.btn-success:hover {
+  background: #248f82;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Danger — Decline/End */
+.btn-danger,
+.end-call-btn,
+[class*="end-btn"] {
+  background: var(--color-danger);
+  color: var(--text-inverse);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-5);
+}
+
+.btn-danger:hover,
+.end-call-btn:hover {
+  background: #d46a52;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Outline variants for Accept/Decline */
+.btn-accept {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border: 1.5px solid var(--color-success-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+}
+
+.btn-accept:hover {
+  background: var(--color-success);
+  color: var(--text-inverse);
+  border-color: var(--color-success);
+}
+
+.btn-decline {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border: 1.5px solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+}
+
+.btn-decline:hover {
+  background: var(--color-danger);
+  color: var(--text-inverse);
+  border-color: var(--color-danger);
+}
+
+/* Icon buttons */
+.btn-icon,
+.notif-btn,
+.call-icon-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+}
+
+.btn-icon:hover,
+.notif-btn:hover,
+.call-icon-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* Small buttons */
+.btn-sm {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-md);
+}
+
+/* Pills (tags, filters only) */
+.toggle-chip,
+.badge-emerald,
+.badge-amber,
+.badge-rose,
+.badge-neutral,
+.badge-live,
+.badge-indigo,
+.badge-cyan,
+.tag {
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-3);
+}
+
+.toggle-chip.active {
+  background: var(--color-primary-800);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-chip:not(.active) {
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.toggle-chip:not(.active):hover {
+  background: var(--bg-surface);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. BADGE & TAG SYSTEM
+   ───────────────────────────────────────────────────────────── */
+.badge-emerald {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.badge-amber,
+.badge-cyan {
+  background: var(--color-warning-light);
+  color: var(--color-amber-600);
+  border: 1px solid rgba(244, 162, 97, 0.20);
+}
+
+.badge-rose {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger-border);
+}
+
+.badge-neutral {
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+}
+
+.badge-live {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+
+.badge-indigo {
+  background: rgba(15, 76, 92, 0.08);
+  color: var(--color-primary-800);
+  border: 1px solid rgba(15, 76, 92, 0.20);
+}
+
+/* Session tags */
+.tag.lang {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+}
+
+.tag.category-medical {
+  background: var(--color-warning-light);
+  color: var(--color-amber-600);
+}
+
+.tag.video {
+  background: rgba(15, 76, 92, 0.08);
+  color: var(--color-primary-800);
+}
+
+.tag.audio {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.tag.time {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-default);
+  color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. NAVIGATION SYSTEM
+   ───────────────────────────────────────────────────────────── */
+.sidebar,
+aside {
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-default);
+}
+
+.nav-item,
+.lb-nav-item {
+  color: var(--text-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.nav-item:hover,
+.lb-nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-item.active,
+.lb-nav-item.active,
+.nav-item[data-active="true"] {
+  background: rgba(15, 76, 92, 0.08);
+  color: var(--color-primary-800);
+  font-weight: 600;
+}
+
+.nav-item.active::before,
+.lb-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--color-primary-800);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Topbar */
+.topbar,
+header {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-default);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. FORM & INPUT SYSTEM
+   ───────────────────────────────────────────────────────────── */
+.input-base,
+input,
+select,
+textarea {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  padding: var(--space-3) var(--space-4);
+  transition: border-color var(--transition-fast), 
+              box-shadow var(--transition-fast);
+}
+
+.input-base::placeholder,
+input::placeholder {
+  color: var(--text-muted);
+}
+
+.input-base:focus,
+input:focus,
+select:focus,
+textarea:focus,
+.lb-lang-select:focus {
+  border-color: var(--color-primary-800);
+  box-shadow: var(--shadow-glow-primary);
+  outline: none;
+}
+
+.select-base,
+select {
+  background-color: var(--bg-surface);
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. DASHBOARD SHELL & LAYOUT
+   ───────────────────────────────────────────────────────────── */
+.dashboard-shell,
+.main-scroll,
+.page-pad,
+.main-area,
+.content {
+  background: var(--bg-page);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. STATUS & UTILITY
+   ───────────────────────────────────────────────────────────── */
+.status-pill {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-1) var(--space-3);
+}
+
+.status-dot,
+.avail-dot.green {
+  background: var(--color-success);
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px rgba(42, 157, 143, 0.20);
+}
+
+.status-dot.pulse {
+  animation: statusPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.session-status.done {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.session-status.missed {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   11. EARNINGS & PRICING (Amber accent)
+   ───────────────────────────────────────────────────────────── */
+.wallet-amount,
+.price,
+.total-price,
+.earnings,
+.payout-amount,
+.rate-val,
+.booking-time {
+  color: var(--color-amber-600);
+  font-weight: 700;
+}
+
+.paid-badge {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   12. AVAILABILITY & CALENDAR
+   ───────────────────────────────────────────────────────────── */
+.avail-slot.available {
+  border-color: var(--color-success);
+  background: var(--color-success-light);
+  border-radius: var(--radius-md);
+}
+
+.avail-slot.busy {
+  border-color: var(--color-danger);
+  background: var(--color-danger-light);
+  border-radius: var(--radius-md);
+}
+
+.avail-slot.offline {
+  border-color: var(--border-default);
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
+}
+
+.booking-date {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.duration-pill {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   13. REFER & PROMO CARDS
+   ───────────────────────────────────────────────────────────── */
+.refer-card {
+  background: linear-gradient(135deg, rgba(15, 76, 92, 0.06), rgba(15, 76, 92, 0.02));
+  border: 1px solid rgba(15, 76, 92, 0.12);
+  border-radius: var(--radius-xl);
+}
+
+.refer-btn {
+  background: var(--color-primary-800);
+  border-radius: var(--radius-pill);
+  color: var(--text-inverse);
+}
+
+.refer-btn:hover {
+  background: var(--color-primary-900);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   14. CALL ROOM (Agora)
+   ───────────────────────────────────────────────────────────── */
+.call-room,
+[class*="call-room"] {
+  background: var(--bg-page);
+}
+
+.video-container,
+[class*="video-container"] {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-default);
+}
+
+.control-btn,
+[class*="control-btn"],
+[class*="mute-btn"] {
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+
+.control-btn:hover,
+[class*="control-btn"]:hover {
+  transform: scale(1.05);
+  background: var(--bg-hover);
+}
+
+[class*="mute-btn"],
+button[title*="mute" i] {
+  background: rgba(15, 76, 92, 0.08);
+  border: 1px solid rgba(15, 76, 92, 0.15);
+  color: var(--color-primary-800);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   15. OVERLAYS, MODALS, TOASTS
+   ───────────────────────────────────────────────────────────── */
+.overlay-backdrop,
+.modal-overlay,
+[class*="modal-overlay"] {
+  background: rgba(241, 245, 249, 0.92);
+  backdrop-filter: blur(12px);
+}
+
+.modal-content,
+[class*="modal-content"] {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+}
+
+.dropdown-menu,
+[role="menu"] {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2);
+}
+
+.dropdown-item,
+[role="menuitem"] {
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover,
+[role="menuitem"]:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.toast-success,
+[class*="toast-success"] {
+  background: var(--color-success-light);
+  border: 1px solid var(--color-success-border);
+  color: var(--color-success);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.toast-error,
+[class*="toast-error"] {
+  background: var(--color-danger-light);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.error-toast {
+  background: var(--color-danger-light);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   16. LOADING & SKELETON
+   ───────────────────────────────────────────────────────────── */
+.spinner,
+[class*="spinner"] {
+  border: 3px solid rgba(15, 76, 92, 0.10);
+  border-top-color: var(--color-primary-800);
+  border-radius: 50%;
+}
+
+.skeleton,
+[class*="skeleton"] {
+  background: linear-gradient(90deg, var(--bg-page) 25%, var(--border-default) 50%, var(--bg-page) 75%);
+  background-size: 200% 100%;
+  border-radius: var(--radius-md);
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   17. DEV SWITCHER
+   ───────────────────────────────────────────────────────────── */
+.dev-switcher,
+[class*="DevRoleSwitcher"] {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-1);
+}
+
+.dev-switcher button,
+[class*="DevRoleSwitcher"] button {
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border: none;
+}
+
+.dev-switcher button:hover,
+[class*="DevRoleSwitcher"] button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.dev-switcher button:first-of-type,
+[class*="DevRoleSwitcher"] button:first-of-type,
+.dev-switcher button.active,
+[class*="DevRoleSwitcher"] button.active {
+  background: var(--color-primary-800);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   18. SCROLLBAR
+   ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-slate-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate-400);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   19. ANIMATIONS
+   ───────────────────────────────────────────────────────────── */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes premiumGlow {
+  0%, 100% { box-shadow: 0 4px 16px rgba(15, 76, 92, 0.20); }
+  50% { box-shadow: 0 8px 32px rgba(15, 76, 92, 0.35); }
+}
+
+.lb-connect-btn {
+  animation: premiumGlow 2.5s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   20. FOCUS STATES (Accessibility)
+   ───────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-800);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   21. ADMIN DASHBOARD SPECIFIC FIXES
+   ───────────────────────────────────────────────────────────── */
+/* Fix dark inline styles from original admin theme */
+[style*="background: #0d1526"],
+[style*="background:#0d1526"],
+[style*="background: #080d1a"],
+[style*="background:#080d1a"] {
+  background: var(--bg-surface) !important;
+  border-color: var(--border-default) !important;
+  color: var(--text-primary) !important;
+}
+
+header[style*="background: rgba(13,21,38,0.9)"] {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--border-default) !important;
+}
+
+th[style*="background: rgba(0,0,0,0.15)"] {
+  background: var(--bg-hover) !important;
+  color: var(--text-muted) !important;
+}
+
+/* Status dots in admin */
+span[style*="background: #10b981"] {
+  background: var(--color-success) !important;
+  box-shadow: 0 0 6px var(--color-success) !important;
+}
+
+span[style*="background: #f59e0b"] {
+  background: var(--color-warning) !important;
+}
+
+span[style*="background: #ef4444"] {
+  background: var(--color-danger) !important;
+}
+
+span[style*="background: #6366f1"] {
+  background: var(--color-primary-800) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   22. CLIENT BOOKING FLOW ENHANCEMENTS
+   ───────────────────────────────────────────────────────────── */
+.lb-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.lb-card-chip:hover {
+  border-color: rgba(15, 76, 92, 0.25);
+  background: rgba(15, 76, 92, 0.03);
+}
+
+.lb-purpose-btn:hover {
+  border-color: rgba(15, 76, 92, 0.30);
+}
+
+.lb-dur-btn:hover {
+  border-color: rgba(15, 76, 92, 0.35);
+  color: var(--text-primary);
+}
+
+.lb-saved-card:hover {
+  border-color: rgba(15, 76, 92, 0.30);
+}
+
+.lb-support-btn:hover {
+  background: rgba(15, 76, 92, 0.04);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   23. INTERPRETER DASHBOARD ENHANCEMENTS
+   ───────────────────────────────────────────────────────────── */
+.stat-icon.green { background: var(--color-success-light); }
+.stat-icon.blue  { background: rgba(15, 76, 92, 0.08); }
+.stat-icon.gold  { background: var(--color-warning-light); }
+.stat-icon.purple{ background: rgba(15, 76, 92, 0.08); }
+
+.panel-badge {
+  background: var(--color-primary-800);
+  color: var(--text-inverse);
+}
+
+.view-all,
+.view-history {
+  color: var(--color-primary-800);
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.view-all:hover,
+.view-history:hover {
+  color: var(--color-primary-900);
+  text-decoration: underline;
+}
+
+.req-avatar {
+  border-radius: 50%;
+}
+
+.mini-btn.accept {
+  background: var(--color-success-light);
+  border: 1px solid var(--color-success-border);
+  color: var(--color-success);
+  border-radius: var(--radius-sm);
+}
+
+.mini-btn.accept:hover {
+  background: var(--color-success);
+  color: var(--text-inverse);
+}
+
+.mini-btn.decline {
+  background: var(--color-danger-light);
+  border: 1px solid var(--color-danger-border);
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+}
+
+.mini-btn.decline:hover {
+  background: var(--color-danger);
+  color: var(--text-inverse);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   24. TOOLTIP
+   ───────────────────────────────────────────────────────────── */
+.tooltip,
+[class*="tooltip"] {
+  background: var(--color-slate-800);
+  color: var(--text-inverse);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--text-xs);
+  padding: var(--space-2) var(--space-3);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   25. PRINT STYLES
+   ───────────────────────────────────────────────────────────── */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  .card-base, .panel, .stat-card {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+}

@@ -6,18 +6,24 @@ import AdminDashboard from './Pages/admin/AdminDashboard';
 import CallRoom from './components/callroom/CallRoom';
 import useRingtone from './hooks/useRingtone';
 
-
+// ── ENV CONFIG (Vite compatible) ─────────────────────────────────
 const AGORA_APP_ID = '3bfd81124304492ea3d119b90d0497c5';
-const SOCKET_URL   =  'http://localhost:3001';
+const SOCKET_URL   = 'https://lingobridge-production.up.railway.app';
+const IS_DEV       = import.meta.env.DEV;
+
+if (!AGORA_APP_ID) {
+  console.error('Missing VITE_AGORA_APP_ID environment variable');
+}
 
 const ROLES = ['client', 'interpreter', 'admin'];
+
 const DEMO_USERS = {
   client:      { name: 'Sara Hassan',    initials: 'SH', role: 'client'      },
   interpreter: { name: 'Ahmad Chaudhry', initials: 'AC', role: 'interpreter' },
-  admin:       { name: 'Admin',          initials: 'AD', role: 'admin'        },
+  admin:       { name: 'Admin',          initials: 'AD', role: 'admin'       },
 };
 
-// ── DEV ROLE SWITCHER ─────────────────────────────────────────────
+// ── DEV ROLE SWITCHER (ONLY ONE definition) ─────────────────────────
 function DevRoleSwitcher({ role, onChange }) {
   return (
     <div style={{
@@ -52,43 +58,21 @@ function DevRoleSwitcher({ role, onChange }) {
   );
 }
 
-// ── CONNECTING OVERLAY ────────────────────────────────────────────
+// ── CONNECTING OVERLAY ──────────────────────────────────────────
 function ConnectingOverlay({ bookingData, onCancel }) {
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 8000,
-      background: 'rgba(5,8,16,0.92)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      gap: 20, fontFamily: 'Inter, sans-serif', backdropFilter: 'blur(8px)',
-    }}>
-      <div style={{
-        width: 52, height: 52,
-        border: '3px solid rgba(124,92,255,0.2)',
-        borderTopColor: '#7C5CFF',
-        borderRadius: '50%',
-        animation: 'lb-spin 0.8s linear infinite',
-      }} />
-      <style>{'@keyframes lb-spin { to { transform: rotate(360deg); } }'}</style>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', marginBottom: 6 }}>
-          Connecting to call…
-        </div>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>
+    <div className="overlay-backdrop">
+      <div className="overlay-spinner" />
+      <div className="text-center">
+        <div className="overlay-title">Connecting to call…</div>
+        <div className="overlay-meta">
           {bookingData?.sessionType === 'video' ? 'Video call' : 'Audio call'}
           {bookingData?.language ? ` · ${bookingData.language}` : ''}
           {bookingData?.purpose  ? ` · ${bookingData.purpose}`  : ''}
         </div>
       </div>
       {onCancel && (
-        <button
-          onClick={onCancel}
-          style={{
-            marginTop: 8, padding: '8px 22px', borderRadius: 8,
-            background: 'rgba(255,255,255,0.07)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            color: 'rgba(255,255,255,0.6)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
-          }}
-        >
+        <button onClick={onCancel} className="overlay-cancel-btn">
           Cancel
         </button>
       )}
@@ -104,21 +88,12 @@ function ErrorToast({ message, onClose }) {
   }, [onClose]);
 
   return (
-    <div style={{
-      position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
-      zIndex: 9000,
-      background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
-      borderRadius: 10, padding: '12px 20px',
-      display: 'flex', alignItems: 'center', gap: 12,
-      fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#fca5a5',
-      maxWidth: 420, boxShadow: '0 4px 20px rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)',
-      animation: 'lb-fadeIn 0.2s ease',
-    }}>
-      <style>{'@keyframes lb-fadeIn { from { opacity:0; transform:translateX(-50%) translateY(8px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }'}</style>
-      <span style={{ flex: 1 }}>{message}</span>
+    <div className="error-toast">
+      <span className="flex-1">{message}</span>
       <button
         onClick={onClose}
-        style={{ background: 'none', border: 'none', color: '#fca5a5', cursor: 'pointer', fontSize: 18, padding: 0, lineHeight: 1 }}
+        className="bg-transparent border-none text-inherit cursor-pointer text-lg p-0 leading-none"
+        style={{ color: '#fca5a5' }}
         aria-label="Dismiss"
       >
         ×
@@ -127,25 +102,61 @@ function ErrorToast({ message, onClose }) {
   );
 }
 
-// ── ROOT APP ──────────────────────────────────────────────────────
+// ── GLOBAL ANIMATIONS (inject once) ─────────────────────────────
+function GlobalStyles() {
+  return (
+    <style>{`
+      @keyframes lb-spin { to { transform: rotate(360deg); } }
+      .lb-spinner { animation: lb-spin 0.8s linear infinite; }
+      @keyframes lb-fadeIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+      }
+      .lb-fade-in { animation: lb-fadeIn 0.2s ease; }
+    `}</style>
+  );
+}
+
+// ── ROOT APP ────────────────────────────────────────────────────
 export default function App() {
   const [role,         setRole]         = useState('client');
   const [callState,    setCallState]    = useState('idle');
   const [callParams,   setCallParams]   = useState(null);
   const [connectError, setConnectError] = useState(null);
   const [socketReady,  setSocketReady]  = useState(false);
-  
-  const [isRinging, setIsRinging] = useState(false);
+  const [isRinging,    setIsRinging]    = useState(false);
+
   useRingtone(isRinging);
-    
-  const user          = DEMO_USERS[role];
-  const socketRef     = useRef(null);       // ✅ starts as null, set inside useEffect
+
+  const user = DEMO_USERS[role];
+  const socketRef     = useRef(null);
   const callParamsRef = useRef(null);
   const roleRef       = useRef(role);
 
   useEffect(() => { roleRef.current = role; }, [role]);
 
-  // ── SOCKET LIFECYCLE ──────────────────────────────────────────
+  // ── Stable helpers (safe to use in socket effect deps) ───────
+  const cleanupCall = useCallback(() => {
+    setIsRinging(false);
+    callParamsRef.current = null;
+    setCallState('idle');
+    setCallParams(null);
+  }, []);
+
+  const emitEndCall = useCallback(() => {
+    const socket = socketRef.current;
+    const roomId = callParamsRef.current?.roomId;
+    if (socket?.connected && roomId) {
+      socket.emit('end-call', { roomId });
+    }
+  }, []);
+
+  const endCall = useCallback(() => {
+    emitEndCall();
+    cleanupCall();
+  }, [emitEndCall, cleanupCall]);
+
+  // ── SOCKET LIFECYCLE ─────────────────────────────────────────
   useEffect(() => {
     const socket = io(SOCKET_URL, {
       transports:           ['websocket'],
@@ -158,9 +169,11 @@ export default function App() {
 
     socketRef.current = socket;
 
-    socket.onAny((eventName, ...args) => {
-      console.log('📨 socket event received:', eventName, args);
-    });
+    if (IS_DEV) {
+      socket.onAny((eventName, ...args) => {
+        console.log('📨 socket event received:', eventName, args);
+      });
+    }
 
     const onConnect = () => {
       console.log('🟢 connected:', socket.id);
@@ -170,6 +183,10 @@ export default function App() {
     const onDisconnect = (reason) => {
       console.log('🔴 disconnected:', reason);
       setSocketReady(false);
+      // Auto-cleanup if we were mid-call
+      if (callParamsRef.current) {
+        cleanupCall();
+      }
     };
 
     const onConnectError = (err) => {
@@ -177,18 +194,26 @@ export default function App() {
     };
 
     const onCallAccepted = (data) => {
-      setIsRinging(false); 
+      setIsRinging(false);
       console.log('🟢 call-accepted | role:', roleRef.current, data);
+
+      // Safety: ignore stray events
+      if (!callParamsRef.current) {
+        console.warn('Ignoring call-accepted: no active call params');
+        return;
+      }
+
       const channelName = data.channelName || data.roomId;
       if (!channelName) {
         setConnectError('Call accepted but no channel provided.');
-        _cleanupCall();
+        cleanupCall();
         return;
       }
+
       const merged = {
         ...callParamsRef.current,
         channel: channelName,
-        roomId:  data.roomId || callParamsRef.current?.roomId || channelName,
+        roomId:  data.roomId || callParamsRef.current.roomId || channelName,
         token:   data.token ?? null,
       };
       callParamsRef.current = merged;
@@ -196,11 +221,11 @@ export default function App() {
       setCallState('in-call');
     };
 
-    const onCallEnded = () => { _cleanupCall(); };
+    const onCallEnded = () => cleanupCall();
 
     const onNoInterpreters = () => {
       setConnectError('No interpreters available.');
-      _cleanupCall();
+      cleanupCall();
     };
 
     socket.on('connect',         onConnect);
@@ -220,26 +245,9 @@ export default function App() {
       socket.disconnect();
       socketRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cleanupCall]);
 
-  // ── HELPERS ───────────────────────────────────────────────────
-  function _cleanupCall() {
-     setIsRinging(false);
-    callParamsRef.current = null;
-    setCallState('idle');
-    setCallParams(null);
-  }
-
-  function _emitEndCall() {
-    const socket = socketRef.current;
-    const roomId = callParamsRef.current?.roomId;
-    if (socket?.connected && roomId) {
-      socket.emit('end-call', { roomId });
-    }
-  }
-
-  // ── CLIENT: CONNECT NOW ───────────────────────────────────────
+  // ── CLIENT: CONNECT NOW ──────────────────────────────────────
   const handleConnectNow = useCallback((bookingData) => {
     setConnectError(null);
     const socket = socketRef.current;
@@ -268,7 +276,7 @@ export default function App() {
     });
   }, []);
 
-  // ── INTERPRETER: ACCEPT CALL ──────────────────────────────────
+  // ── INTERPRETER: ACCEPT CALL ─────────────────────────────────
   const handleAcceptCall = useCallback((bookingData) => {
     setConnectError(null);
     const socket = socketRef.current;
@@ -276,7 +284,7 @@ export default function App() {
       setConnectError('Not connected to server.');
       return;
     }
-    const roomId = bookingData.roomId || bookingData.id;
+    const roomId = bookingData?.roomId || bookingData?.id;
     if (!roomId) {
       setConnectError('Cannot accept this call — room ID is missing.');
       return;
@@ -294,76 +302,57 @@ export default function App() {
     socket.emit('accept-call', { roomId });
   }, []);
 
-  // ── LEAVE CALL ────────────────────────────────────────────────
-  const handleLeave = useCallback(() => {
-    _emitEndCall();
-    _cleanupCall();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleCancelConnect = useCallback(() => {
-    _emitEndCall();
-    _cleanupCall();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ── ROLE CHANGE (dev tool) ────────────────────────────────────
+  // ── ROLE CHANGE (dev tool) ───────────────────────────────────
   const handleRoleChange = useCallback((nextRole) => {
-    _emitEndCall();
-    _cleanupCall();
+    endCall();
     setRole(nextRole);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [endCall]);
 
   const handleSchedule = useCallback((bookingData) => {
     alert(`Session scheduled!\n\n${JSON.stringify(bookingData, null, 2)}`);
   }, []);
 
-  // ── RENDER: IN-CALL ───────────────────────────────────────────
+  // ── RENDER: IN-CALL ──────────────────────────────────────────
   if (callState === 'in-call') {
     if (!callParams?.channel) {
       return (
-        <ConnectingOverlay
-          bookingData={callParams?.bookingData}
-          onCancel={handleCancelConnect}
-        />
+        <>
+          <GlobalStyles />
+          <ConnectingOverlay bookingData={callParams?.bookingData} onCancel={endCall} />
+        </>
       );
     }
     return (
-      <CallRoom
-        appId={AGORA_APP_ID}
-        channel={callParams.channel}
-        token={callParams.token ?? null}
-        uid={role === 'client' ? 1 : 2}
-        userName={user.name}
-        sessionType={callParams.bookingData?.sessionType ?? 'video'}
-        onLeave={handleLeave}
-      />
+      <>
+        <GlobalStyles />
+        <CallRoom
+          appId={AGORA_APP_ID}
+          channel={callParams.channel}
+          token={callParams.token ?? null}
+          uid={role === 'client' ? 1 : 2}   // TODO: request UID from server
+          userName={user.name}
+          sessionType={callParams.bookingData?.sessionType ?? 'video'}
+          onLeave={endCall}
+        />
+      </>
     );
   }
 
-  // ── RENDER: DASHBOARDS ────────────────────────────────────────
+  // ── RENDER: DASHBOARDS ───────────────────────────────────────
   return (
     <>
+      <GlobalStyles />
+
       {callState === 'waiting' && (
-        <ConnectingOverlay
-          bookingData={callParams?.bookingData}
-          onCancel={handleCancelConnect}
-        />
+        <ConnectingOverlay bookingData={callParams?.bookingData} onCancel={endCall} />
       )}
 
       {connectError && (
-        <ErrorToast
-          message={connectError}
-          onClose={() => setConnectError(null)}
-        />
+        <ErrorToast message={connectError} onClose={() => setConnectError(null)} />
       )}
 
-    
-        <ClientDashboard
-          onConnectNow={handleConnectNow}
-          onSchedule={handleSchedule}
-        />
+      {role === 'client' && (
+        <ClientDashboard onConnectNow={handleConnectNow} onSchedule={handleSchedule} />
       )}
 
       {role === 'interpreter' && (
@@ -375,11 +364,9 @@ export default function App() {
         />
       )}
 
-      {role === 'admin' && (
-        <AdminDashboard user={user} />
-      )}
+      {role === 'admin' && <AdminDashboard user={user} />}
 
-      <DevRoleSwitcher role={role} onChange={handleRoleChange} />
+      {IS_DEV && <DevRoleSwitcher role={role} onChange={handleRoleChange} />}
     </>
   );
 }
